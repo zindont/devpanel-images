@@ -1,0 +1,15 @@
+FROM nginx
+
+ENV NGINX_SERVER_ROOT "/var/www/html"
+ENV NGINX_VHOST_TYPE "php"
+ENV NGINX_FPM_HOST "0.0.0.0"
+ENV NGINX_FPM_PORT "9000"
+ENV NGINX_CONF_INCLUDE "/etc/nginx/conf.d"
+ENV NGINX_CLIENT_MAX_BODY_SIZE "64M"
+
+COPY templates /templates
+
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+RUN chmod +x /usr/local/bin/docker-entrypoint
+
+ENTRYPOINT ["docker-entrypoint"]
