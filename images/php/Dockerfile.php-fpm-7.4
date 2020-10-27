@@ -56,8 +56,8 @@ RUN apt-get update \
 
 # Install MailHog
 RUN wget https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64 \
-    && sudo chmod +x mhsendmail_linux_amd64 \
-    && sudo mv mhsendmail_linux_amd64 /usr/local/bin/mhsendmail
+  && sudo chmod +x mhsendmail_linux_amd64 \
+  && sudo mv mhsendmail_linux_amd64 /usr/local/bin/mhsendmail
 
 # Configure the gd library
 RUN docker-php-ext-configure \
@@ -169,22 +169,25 @@ RUN docker-php-ext-enable \
   pcntl
 
 RUN groupadd -g ${GID} ${GROUP} \
-    && useradd --system --shell /bin/bash --uid ${UID} --gid ${GROUP}  --create-home --home-dir /home/${USER} ${USER} \
-    && apt install -y sudo \
-    && usermod -aG sudo ${USER} \
-    && echo "www    ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
+  && useradd --system --shell /bin/bash --uid ${UID} --gid ${GROUP}  --create-home --home-dir /home/${USER} ${USER} \
+  && apt install -y sudo \
+  && usermod -aG sudo ${USER} \
+  && echo "www    ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 RUN mkdir -p ${APP_ROOT} \
-    && chown -R ${UID}:${GID} ${APP_ROOT}
+  && chown -R ${UID}:${GID} ${APP_ROOT}
 
 #== Install Codeserver
 ARG CODESERVER_VERSION="3.6.0"
 COPY ./lib/code-server_${CODESERVER_VERSION}_amd64.deb /tmp/
 RUN dpkg -i /tmp/code-server_${CODESERVER_VERSION}_amd64.deb \
-    && rm /tmp/code-server_${CODESERVER_VERSION}_amd64.deb
+  && rm /tmp/code-server_${CODESERVER_VERSION}_amd64.deb
 
 #== Install Composer
 RUN curl -fsSL https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+#== Install WP-CLI
+COPY --from=wordpress:cli-php7.4 /usr/local/bin/wp /usr/local/bin/wp
 
 WORKDIR ${APP_ROOT}
 
